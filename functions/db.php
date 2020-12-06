@@ -15,6 +15,7 @@ function escape($string) {
 function query($query) {
     global $con;
     return mysqli_query($con,$query);
+    
 }
 function confirm($result) {
     global $con;

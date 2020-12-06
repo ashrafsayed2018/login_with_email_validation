@@ -1,8 +1,16 @@
 <?php 
 require_once "includes/header.php";
 ?>
-<div class="row">
-
+	<div class="row">
+	    <div class="col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3">
+			<div class="alert-placeholder">
+					  <?php 
+					  display_message();
+					  password_reset();
+					 
+					   ?>
+	        </div>
+	   </div>
 	</div>
     	<div class="row">
 			<div class="col-md-6 col-md-offset-3">
@@ -12,6 +20,7 @@ require_once "includes/header.php";
 						
 							<div class="col-xs-12">
 								<h3>Reset Password</h3>
+
 							</div>
 						</div>
 						<hr>
@@ -33,6 +42,7 @@ require_once "includes/header.php";
 												<input type="submit" name="reset-password-submit" id="reset-password-submit" tabindex="4" class="form-control btn btn-register" value="Reset Password">
 											</div>
 										</div>
+										<input type="hidden" class="hide" name="token" id="token" value="<?php echo token_generator()?>">
 									</div>
 								</form>
 							</div>

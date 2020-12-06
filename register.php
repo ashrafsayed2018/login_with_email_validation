@@ -8,8 +8,13 @@ require_once "includes/nav.php";
 		<div class="col-lg-6 col-lg-offset-3">
 
 		<?php 
-         validate_user_registeration();
+			if(logged_in()) {
+				redirect('index.php');
+			}
+		 validate_user_registeration();
+		 display_message();
 		?>
+
 
 								
 		</div>
