@@ -5,7 +5,10 @@ require_once "includes/nav.php";
 	<div class="jumbotron">
 		<h1 class="text-center"> 
 		welcome to Home page 
-		<?php  display_message();?></h1>
+		<?php  
+		
+		 display_message(); 
+		 ?></h1>
 	</div>
 <?php
 

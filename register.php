@@ -10,9 +10,10 @@ require_once "includes/nav.php";
 		<?php 
 			if(logged_in()) {
 				redirect('index.php');
+			
 			}
-		 validate_user_registeration();
-		 display_message();
+			validate_user_registeration();
+	
 		?>
 
 

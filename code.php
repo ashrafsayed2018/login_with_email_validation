@@ -18,6 +18,8 @@ require_once "includes/header.php";
 						<?php 
 						display_message();
 						 validate_code ();
+
+					
 						?>
 					</div>
 					<div class="panel panel-success">
@@ -27,7 +29,7 @@ require_once "includes/header.php";
 									<div class="text-center"><h2><b> Enter Code</b></h2></div>
 									<form id="register-form"  method="post" role="form" autocomplete="off">
 										<div class="form-group">
-											<input type="text" name="code" id="code" tabindex="1" class="form-control" placeholder="##########" value="" autocomplete="off" required/>
+											<input type="text" name="code" id="code" tabindex="1" class="form-control" placeholder="##########" value="<?php echo $_GET['code']; ?>" autocomplete="off" required/>
 										</div>
 										<div class="form-group">
 											<div class="row">

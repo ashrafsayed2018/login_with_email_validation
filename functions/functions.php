@@ -1,5 +1,13 @@
 <?php
 
+// Import PHPMailer classes into the global namespace
+// These must be at the top of your script, not inside a function
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+require "vendor/autoload.php";
+
 /* ************** helper functions ************** */
 // clean the html entities 
 function clean($string) {
@@ -71,8 +79,44 @@ function username_exist($username) {
     }
 }
 
-function send_email($email,$subject,$msg,$headers) {
-     return mail($email,$subject,$msg,$headers);
+function send_email($email = null,$subject  = null,$msg  = null,$headers  = null) {
+    // Instantiation and passing `true` enables exceptions
+    $mail = new PHPMailer(true);
+
+    try {
+
+    //Server settings
+    // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      // Enable verbose debug output
+    $mail->SMTPDebug = 1; 
+    // $mail->isSMTP();                                            // Send using SMTP
+    $mail->Host       = Config::STMP_HOST;                    // Set the SMTP server to send through
+    $mail->Username   = Config::STMP_USER;                     // SMTP username
+    $mail->Password   = Config::STMP_PASSWORD;                     // SMTP password
+    $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+
+    $mail->Port       = Config::STMP_PORT; 
+    $mail->SMTPSecure ="ssl";  
+    // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
+    $mail->isHTML = true;
+    $mail->CharSet = "UTF-8";
+
+    //Recipients
+    $mail->setFrom('from@ashrafsayed.com', 'ashraf sayed');
+    $mail->addAddress($subject);     // Add a recipient
+
+
+    // Content
+    $mail->isHTML(true);                                  // Set email format to HTML
+    $mail->Subject = $subject;
+    $mail->Body    = $msg;
+    $mail->AltBody = $msg;
+
+    $mail->send();
+        echo 'Message has been sent';
+    } catch (Exception $e) {
+        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+    }
+    //  return mail($email,$subject,$msg,$headers);
 }
 //  validatins user registeration function 
 
@@ -154,11 +198,12 @@ function validate_user_registeration() {
         } else {
             if(register_user($first_name,$last_name,$username,$email,$password)) {
 
-            set_messages("<p class='bg-success text-center' > please check your email or spam folder for an activation link </p>");
-            redirect('index.php');
+             set_messages("<p class='alert alert-success text-center'> please check your email or spam folder for an activation link </p>");
+             redirect('index.php');
+
               
             } else {
-                set_messages("<p class='bg-danger text-center' > Sorry we could not register the user </p>");
+                set_messages("<p class='alert alert-danger text-center' > Sorry we could not register the user </p>");
                 redirect('index.php');
             }
            
@@ -180,7 +225,7 @@ function register_user($first_name,$last_name,$username,$email,$password) {
         return false;
     } else {
         // encrypt password 
-        $password = md5($password);
+        $password = password_hash($password,PASSWORD_BCRYPT,array('const' =>12));
 
         $validation_code = token_generator();
 
@@ -189,15 +234,14 @@ function register_user($first_name,$last_name,$username,$email,$password) {
         $sql = "INSERT INTO users (first_name,last_name,username,password,email,validation_code,active) VALUES('$first_name','$last_name','$username','$password','$email','$validation_code',0)";
 
         $result = query($sql);
-      
 
-        $subject = "activate account";
+        $subject = "ashraf@gmail.com";
         $msg     = "
         Please click the link to activate the account 
-        http://login.local/activate.php?email=$email&code=$validation_code";
+        <a href='".Config::DEVELOPMENT_URL ."/activate.php?email=$email&code=$validation_code'>Activate your account </a>";
         $headers = "from : ashraf@e3lanat.com";
         send_email($email,$subject,$msg,$headers);
-        return true;
+         return true;
     }
 
 }
@@ -224,10 +268,10 @@ function activate_user() {
                $sql2 = "UPDATE users set validation_code = 0 , active = 1 where email = '$email' and validation_code = '$validation_code'";
                $result2 = query($sql2);
 
-              set_messages("<p class='bg-success'> Your account has been activated please login </p>");
+              set_messages("<p class='alert alert-success'> Your account has been activated please login </p>");
               redirect('login.php');
            } else {
-                 set_messages("<p class='bg-danger'> Your account has not been activated !!! </p>");
+                 set_messages("<p class='alert alert-danger'> Your account has not been activated !!! </p>");
                  redirect('register.php');
 
            }
@@ -270,7 +314,7 @@ function validate_user_login() {
           if(login_user($email,$password,$remember)) {
               redirect('admin.php');
           } else {
-              echo validation_errors('<p class="bg-danger text-center">Your credentials are not correct</p>');
+              echo validation_errors('<p class="alert alert-danger text-center">Your credentials are not correct</p>');
           }
         }
   
@@ -290,9 +334,9 @@ function login_user($email,$password,$remember) {
 
             $row = fetch_array($result);
             $db_password = $row['password'];
-            $password = md5($password);
+          
 
-            if($password === $db_password) {
+            if(password_verify($password,$db_password)) {
 
                 // check if the remember check box is checked 
 
@@ -351,24 +395,22 @@ function recover_password() {
                   echo "no updates";
               }
 
-              $subject = "Please reset your password";
-              $msg     = "Here is your passowrd reset code $validation_code 
+              $subject = "ashraf@gmail.com";
+              $msg     = "Here is your passowrd reset code
+              <strong style='color:green'>$validation_code</strong> 
+
                Click her to reset  your password 
-               http://login.local/code.php?email=$email&code=$validation_code";
+               <a href='".Config::DEVELOPMENT_URL ."/code.php?email=$email&code=$validation_code'> click to rest your password </a>";
 
               $headers = "from : ashraf@e3lanat.com";
 
-              if(!send_email($email,$subject,$msg,$headers)) {
-
-                echo validation_errors("Email can not be sent ");
-              } 
-
+             send_email($email,$subject,$msg,$headers);
 
               // set message 
 
               set_messages("<p class='alert alert-success text-center'> Please check your email or spam folder for a password reset </p>");
 
-              redirect('index.php');
+               redirect('index.php');
 
 
            } else {
@@ -463,7 +505,7 @@ function password_reset() {
                           $errors[] = "password length should be more than 8 chars ";
                         }
                         if(!empty($password) && mb_strlen($password) > 7 && $password != $confirm_password) {
-                            $errors[] = "the tow passwords not identicals ";
+                            $errors[] = "the two passwords not identicals ";
                         }
 
                     // check if errors array is empty 
@@ -476,7 +518,7 @@ function password_reset() {
                         $updated_password = md5($password);
                         echo $updated_password;
 
-                        $sql = "UPDATE users SET password ='$updated_password',validation_code = 0  WHERE email='$email'";
+                        $sql = "UPDATE users SET password ='$updated_password',validation_code = 0, active = 1  WHERE email='$email'";
 
                         $result = query($sql);
                         confirm($result);
