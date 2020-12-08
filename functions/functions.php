@@ -87,22 +87,25 @@ function send_email($email = null,$subject  = null,$msg  = null,$headers  = null
 
     //Server settings
     // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      // Enable verbose debug output
-    $mail->SMTPDebug = 1; 
-    // $mail->isSMTP();                                            // Send using SMTP
-    $mail->Host       = Config::STMP_HOST;                    // Set the SMTP server to send through
-    $mail->Username   = Config::STMP_USER;                     // SMTP username
-    $mail->Password   = Config::STMP_PASSWORD;                     // SMTP password
-    $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+    // $mail->SMTPDebug = 1; 
+    $mail->isSMTP();                                            // Send using SMTP
+    $mail->Host       = Config::SMTP_HOST;                    // Set the SMTP server to send through
+    $mail->Username   = Config::SMTP_USER;                     // SMTP username
+    $mail->Password   = Config::SMTP_PASSWORD;                     // SMTP password
+                                  
 
-    $mail->Port       = Config::STMP_PORT; 
-    $mail->SMTPSecure ="ssl";  
+    $mail->Port       = Config::SMTP_PORT; 
+
+
+    $mail->SMTPAuth = TRUE;      // enable smtp authantication 
+    $mail->SMTPSecure ="tls";  
     // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
     $mail->isHTML = true;
     $mail->CharSet = "UTF-8";
 
     //Recipients
     $mail->setFrom('from@ashrafsayed.com', 'ashraf sayed');
-    $mail->addAddress($subject);     // Add a recipient
+    $mail->addAddress($email,'ashraf sayed');     // Add a recipient
 
 
     // Content
@@ -410,7 +413,7 @@ function recover_password() {
 
               set_messages("<p class='alert alert-success text-center'> Please check your email or spam folder for a password reset </p>");
 
-               redirect('index.php');
+            //    redirect('index.php');
 
 
            } else {

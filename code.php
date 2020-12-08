@@ -7,7 +7,7 @@ require_once "includes/header.php";
 			<div class="alert alert-success alert-dismissible" role="alert">
 				<button type="button" class="close" data-dismiss="alert">
 					<span aria-hidden="true">×</span><span class="sr-only">Close</span>
-				</button>We have a sent a security code to your email <span>@edwin@email.com</span>
+				</button>We have a sent a security code to your email 
 			</div>					
 		</div>
 	</div>
@@ -16,7 +16,7 @@ require_once "includes/header.php";
 				<div class="col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3">
 					<div class="alert-placeholder">
 						<?php 
-						display_message();
+						 display_message();
 						 validate_code ();
 
 					
